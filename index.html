@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuditPulse AI - Autonomous Compliance & Viral Security Scanner</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        function App() {
+            const [activeTab, setActiveTab] = React.useState('scanner');
+            const [domainInput, setDomainInput] = React.useState('');
+            const [scanning, setScanning] = React.useState(false);
+            const [scanResult, setScanResult] = React.useState(null);
+
+            const handleScan = (e) => {
+                e.preventDefault();
+                if (!domainInput) return;
+                setScanning(true);
+                setTimeout(() => {
+                    setScanning(false);
+                    setScanResult({
+                        domain: domainInput,
+                        score: 42,
+                        riskLevel: 'HIGH RISK',
+                        roast: `"Your AWS S3 bucket security policy is so wide open, even Internet Explorer could walk right in. Hardcoded Stripe live keys found in public JS bundles? Bold strategy!"`,
+                        vulnerabilities: [
+                            { title: 'Public S3 Bucket Read Permissions', severity: 'Critical', fix: 'aws s3api put-public-access-block --bucket ...' },
+                            { title: 'Missing EU AI Act Risk Disclosure', severity: 'High', fix: 'Generate Model Card & Article 52 compliance tag.' },
+                            { title: 'Exposed Secret Key (Stripe)', severity: 'Critical', fix: 'Revoke key in Dashboard & rotate secrets.' }
+                        ]
+                    });
+                }, 1200);
+            };
+
+            return (
+                <div className="min-h-screen bg-slate-950 flex flex-col">
+                    <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                            <div className="bg-gradient-to-tr from-violet-600 to-indigo-500 p-2 rounded-xl text-white font-black shadow-lg shadow-violet-500/30">
+                                AP
+                            </div>
+                            <div>
+                                <h1 className="text-lg font-bold tracking-tight text-white">AuditPulse AI</h1>
+                                <p className="text-xs text-slate-400">Autonomous Compliance & Viral Security Scanner</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center space-x-4">
+                            <button onClick={() => setActiveTab('scanner')} className={`px-4 py-2 rounded-lg text-sm font-medium transition ${activeTab === 'scanner' ? 'bg-violet-600 text-white' : 'text-slate-400 hover:text-white'}`}>
+                                Viral Roast Scanner
+                            </button>
+                            <button onClick={() => setActiveTab('leaderboard')} className={`px-4 py-2 rounded-lg text-sm font-medium transition ${activeTab === 'leaderboard' ? 'bg-violet-600 text-white' : 'text-slate-400 hover:text-white'}`}>
+                                Wall of Shame
+                            </button>
+                        </div>
+                    </header>
+
+                    <main className="flex-1 max-w-6xl w-full mx-auto p-6">
+                        {activeTab === 'scanner' && (
+                            <div className="space-y-8 py-10">
+                                <div className="text-center max-w-2xl mx-auto space-y-4">
+                                    <span className="px-3 py-1 text-xs font-semibold bg-violet-500/10 text-violet-400 border border-violet-500/20 rounded-full">
+                                        ⚡ Viral AI Security Engine 2026
+                                    </span>
+                                    <h2 className="text-4xl font-extrabold tracking-tight text-white">Roast Your Startup's Security & Compliance</h2>
+                                    <p className="text-slate-400">Enter your domain to calculate your public exposure score, generate an AI security roast, and patch compliance gaps.</p>
+                                </div>
+
+                                <form onSubmit={handleScan} className="max-w-xl mx-auto flex gap-3">
+                                    <input 
+                                        type="text" 
+                                        placeholder="e.g. yourstartup.com" 
+                                        value={domainInput} 
+                                        onChange={(e) => setDomainInput(e.target.value)}
+                                        className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-violet-500"
+                                    />
+                                    <button type="submit" disabled={scanning} className="bg-violet-600 hover:bg-violet-500 text-white font-semibold px-6 py-3 rounded-xl transition shadow-lg shadow-violet-600/30">
+                                        {scanning ? 'Scanning...' : 'Run Security Roast'}
+                                    </button>
+                                </form>
+
+                                {scanResult && (
+                                    <div className="max-w-2xl mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6 shadow-2xl">
+                                        <div className="flex justify-between items-center border-b border-slate-800 pb-4">
+                                            <div>
+                                                <h3 className="text-xl font-bold text-white">{scanResult.domain}</h3>
+                                                <p className="text-xs text-rose-400 font-semibold mt-1">Status: {scanResult.riskLevel}</p>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="text-3xl font-black text-rose-500">{scanResult.score}/100</div>
+                                                <div className="text-xs text-slate-400">Exposure Score</div>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-rose-950/30 border border-rose-900/50 rounded-xl p-4">
+                                            <h4 className="text-xs font-bold text-rose-400 uppercase tracking-wider mb-2">🔥 AI Security Roast</h4>
+                                            <p className="text-sm italic text-slate-300">{scanResult.roast}</p>
+                                        </div>
+
+                                        <div className="space-y-3">
+                                            <h4 className="text-sm font-semibold text-white">Detected Vulnerabilities</h4>
+                                            {scanResult.vulnerabilities.map((v, idx) => (
+                                                <div key={idx} className="bg-slate-950 border border-slate-800 rounded-xl p-3 flex justify-between items-center">
+                                                    <div>
+                                                        <p className="text-sm font-medium text-slate-200">{v.title}</p>
+                                                        <code className="text-xs text-violet-400 bg-slate-900 px-2 py-0.5 rounded mt-1 inline-block">{v.fix}</code>
+                                                    </div>
+                                                    <span className="px-2.5 py-1 text-xs font-semibold bg-rose-500/10 text-rose-400 rounded-full">{v.severity}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {activeTab === 'leaderboard' && (
+                            <div className="space-y-6 py-10 max-w-3xl mx-auto">
+                                <h3 className="text-2xl font-bold text-white">Wall of Shame vs. Wall of Fame</h3>
+                                <p className="text-slate-400 text-sm">Companies ranked by real-time public exposure and SOC 2 compliance readiness.</p>
+                                <div className="space-y-3">
+                                    <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex justify-between items-center">
+                                        <div>
+                                            <h4 className="font-bold text-white">acme-fintech.io</h4>
+                                            <p className="text-xs text-rose-400">Exposed API keys & missing SOC 2 Type II</p>
+                                        </div>
+                                        <span className="px-3 py-1 bg-rose-500/10 text-rose-400 text-xs font-bold rounded-full">Score: 28/100</span>
+                                    </div>
+                                    <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex justify-between items-center">
+                                        <div>
+                                            <h4 className="font-bold text-white">secure-ai-cloud.com</h4>
+                                            <p className="text-xs text-emerald-400">Fully Compliant (SOC 2 + ISO 42001)</p>
+                                        </div>
+                                        <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 text-xs font-bold rounded-full">Score: 98/100</span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </main>
+
+                    <footer className="border-t border-slate-900 py-6 text-center text-xs text-slate-500">
+                        AuditPulse AI © 2026. Built for viral growth & automated compliance.
+                    </footer>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
