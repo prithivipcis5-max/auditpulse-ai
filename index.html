@@ -22,24 +22,32 @@
             const [scanning, setScanning] = React.useState(false);
             const [scanResult, setScanResult] = React.useState(null);
 
-            const handleScan = (e) => {
+            const handleScan = async (e) => {
                 e.preventDefault();
                 if (!domainInput) return;
+                
                 setScanning(true);
-                setTimeout(() => {
-                    setScanning(false);
-                    setScanResult({
-                        domain: domainInput,
-                        score: 42,
-                        riskLevel: 'HIGH RISK',
-                        roast: `"Your AWS S3 bucket security policy is so wide open, even Internet Explorer could walk right in. Hardcoded Stripe live keys found in public JS bundles? Bold strategy!"`,
-                        vulnerabilities: [
-                            { title: 'Public S3 Bucket Read Permissions', severity: 'Critical', fix: 'aws s3api put-public-access-block --bucket ...' },
-                            { title: 'Missing EU AI Act Risk Disclosure', severity: 'High', fix: 'Generate Model Card & Article 52 compliance tag.' },
-                            { title: 'Exposed Secret Key (Stripe)', severity: 'Critical', fix: 'Revoke key in Dashboard & rotate secrets.' }
-                        ]
+                setScanResult(null);
+
+                try {
+                    const response = await fetch('/api/scan', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ domain: domainInput })
                     });
-                }, 1200);
+                    
+                    const data = await response.json();
+                    
+                    if (data.error) {
+                        alert('Error: ' + data.error);
+                    } else {
+                        setScanResult(data);
+                    }
+                } catch (err) {
+                    alert('Scan request failed. Make sure your Vercel Environment Variable (GEMINI_API_KEY) is added!');
+                } finally {
+                    setScanning(false);
+                }
             };
 
             return (
@@ -51,12 +59,12 @@
                             </div>
                             <div>
                                 <h1 className="text-lg font-bold tracking-tight text-white">AuditPulse AI</h1>
-                                <p className="text-xs text-slate-400">Autonomous Compliance & Viral Security Scanner</p>
+                                <p className="text-xs text-slate-400">Autonomous Compliance & Live Security Roast Engine</p>
                             </div>
                         </div>
                         <div className="flex items-center space-x-4">
                             <button onClick={() => setActiveTab('scanner')} className={`px-4 py-2 rounded-lg text-sm font-medium transition ${activeTab === 'scanner' ? 'bg-violet-600 text-white' : 'text-slate-400 hover:text-white'}`}>
-                                Viral Roast Scanner
+                                Live Roast Scanner
                             </button>
                             <button onClick={() => setActiveTab('leaderboard')} className={`px-4 py-2 rounded-lg text-sm font-medium transition ${activeTab === 'leaderboard' ? 'bg-violet-600 text-white' : 'text-slate-400 hover:text-white'}`}>
                                 Wall of Shame
@@ -69,22 +77,22 @@
                             <div className="space-y-8 py-10">
                                 <div className="text-center max-w-2xl mx-auto space-y-4">
                                     <span className="px-3 py-1 text-xs font-semibold bg-violet-500/10 text-violet-400 border border-violet-500/20 rounded-full">
-                                        ⚡ Viral AI Security Engine 2026
+                                        ⚡ Powered by Gemini AI
                                     </span>
-                                    <h2 className="text-4xl font-extrabold tracking-tight text-white">Roast Your Startup's Security & Compliance</h2>
-                                    <p className="text-slate-400">Enter your domain to calculate your public exposure score, generate an AI security roast, and patch compliance gaps.</p>
+                                    <h2 className="text-4xl font-extrabold tracking-tight text-white">Roast Any Domain's Live Security</h2>
+                                    <p className="text-slate-400">Enter a website domain to perform a real DNS & security record scan, powered by Gemini.</p>
                                 </div>
 
                                 <form onSubmit={handleScan} className="max-w-xl mx-auto flex gap-3">
                                     <input 
                                         type="text" 
-                                        placeholder="e.g. yourstartup.com" 
+                                        placeholder="e.g. github.com or yourstartup.com" 
                                         value={domainInput} 
                                         onChange={(e) => setDomainInput(e.target.value)}
                                         className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-violet-500"
                                     />
                                     <button type="submit" disabled={scanning} className="bg-violet-600 hover:bg-violet-500 text-white font-semibold px-6 py-3 rounded-xl transition shadow-lg shadow-violet-600/30">
-                                        {scanning ? 'Scanning...' : 'Run Security Roast'}
+                                        {scanning ? 'Scanning DNS & AI Roasting...' : 'Run Live Security Roast'}
                                     </button>
                                 </form>
 
@@ -97,18 +105,18 @@
                                             </div>
                                             <div className="text-right">
                                                 <div className="text-3xl font-black text-rose-500">{scanResult.score}/100</div>
-                                                <div className="text-xs text-slate-400">Exposure Score</div>
+                                                <div className="text-xs text-slate-400">Public Exposure Score</div>
                                             </div>
                                         </div>
 
                                         <div className="bg-rose-950/30 border border-rose-900/50 rounded-xl p-4">
-                                            <h4 className="text-xs font-bold text-rose-400 uppercase tracking-wider mb-2">🔥 AI Security Roast</h4>
+                                            <h4 className="text-xs font-bold text-rose-400 uppercase tracking-wider mb-2">🔥 Gemini Security Roast</h4>
                                             <p className="text-sm italic text-slate-300">{scanResult.roast}</p>
                                         </div>
 
                                         <div className="space-y-3">
-                                            <h4 className="text-sm font-semibold text-white">Detected Vulnerabilities</h4>
-                                            {scanResult.vulnerabilities.map((v, idx) => (
+                                            <h4 className="text-sm font-semibold text-white">Real Live Findings & Compliance Gaps</h4>
+                                            {scanResult.vulnerabilities && scanResult.vulnerabilities.map((v, idx) => (
                                                 <div key={idx} className="bg-slate-950 border border-slate-800 rounded-xl p-3 flex justify-between items-center">
                                                     <div>
                                                         <p className="text-sm font-medium text-slate-200">{v.title}</p>
@@ -131,14 +139,14 @@
                                     <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex justify-between items-center">
                                         <div>
                                             <h4 className="font-bold text-white">acme-fintech.io</h4>
-                                            <p className="text-xs text-rose-400">Exposed API keys & missing SOC 2 Type II</p>
+                                            <p className="text-xs text-rose-400">Missing SPF / DMARC & open headers</p>
                                         </div>
                                         <span className="px-3 py-1 bg-rose-500/10 text-rose-400 text-xs font-bold rounded-full">Score: 28/100</span>
                                     </div>
                                     <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex justify-between items-center">
                                         <div>
                                             <h4 className="font-bold text-white">secure-ai-cloud.com</h4>
-                                            <p className="text-xs text-emerald-400">Fully Compliant (SOC 2 + ISO 42001)</p>
+                                            <p className="text-xs text-emerald-400">Fully Compliant DNS & SOC 2</p>
                                         </div>
                                         <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 text-xs font-bold rounded-full">Score: 98/100</span>
                                     </div>
